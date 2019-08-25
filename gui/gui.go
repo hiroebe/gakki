@@ -2,7 +2,6 @@ package gui
 
 import (
 	"github.com/andlabs/ui"
-	"github.com/hiroebe/gakki"
 )
 
 const (
@@ -11,24 +10,24 @@ const (
 	keyPadding = 5.0
 )
 
-func GetDefaultGUI() gakki.UI {
-	return &defaultGUI{}
+func GetDefaultGUI() *DefaultGUI {
+	return &DefaultGUI{}
 }
 
-type defaultGUI struct {
+type DefaultGUI struct {
 	keyboard       [][]rune
 	keyDisplayFunc func(rune) string
 }
 
-func (g *defaultGUI) SetKeyboard(keyboard [][]rune) {
+func (g *DefaultGUI) SetKeyboard(keyboard [][]rune) {
 	g.keyboard = keyboard
 }
 
-func (g *defaultGUI) SetKeyDisplayFunc(f func(rune) string) {
+func (g *DefaultGUI) SetKeyDisplayFunc(f func(rune) string) {
 	g.keyDisplayFunc = f
 }
 
-func (g *defaultGUI) Run(keydownCh, keyupCh chan<- rune) error {
+func (g *DefaultGUI) Run(keydownCh, keyupCh chan<- rune) error {
 	return ui.Main(func() {
 		area := ui.NewArea(areaHandler{
 			keydownCh:      keydownCh,
@@ -50,7 +49,7 @@ func (g *defaultGUI) Run(keydownCh, keyupCh chan<- rune) error {
 	})
 }
 
-func (g *defaultGUI) Close() {}
+func (g *DefaultGUI) Close() {}
 
 type areaHandler struct {
 	keydownCh      chan<- rune

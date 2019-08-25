@@ -3,32 +3,31 @@ package cui
 import (
 	"time"
 
-	"github.com/hiroebe/gakki"
 	"github.com/nsf/termbox-go"
 )
 
-func GetDefaultCUI() gakki.UI {
-	return &defaultCUI{
+func GetDefaultCUI() *DefaultCUI {
+	return &DefaultCUI{
 		typedKeys: map[rune]bool{},
 	}
 }
 
-type defaultCUI struct {
+type DefaultCUI struct {
 	keyboard       [][]rune
 	keyDisplayFunc func(rune) string
 
 	typedKeys map[rune]bool
 }
 
-func (c *defaultCUI) SetKeyboard(keyboard [][]rune) {
+func (c *DefaultCUI) SetKeyboard(keyboard [][]rune) {
 	c.keyboard = keyboard
 }
 
-func (c *defaultCUI) SetKeyDisplayFunc(f func(rune) string) {
+func (c *DefaultCUI) SetKeyDisplayFunc(f func(rune) string) {
 	c.keyDisplayFunc = f
 }
 
-func (c *defaultCUI) Run(keydownCh, keyupCh chan<- rune) error {
+func (c *DefaultCUI) Run(keydownCh, keyupCh chan<- rune) error {
 	if err := termbox.Init(); err != nil {
 		return err
 	}
@@ -64,11 +63,11 @@ MAINLOOP:
 	return nil
 }
 
-func (c *defaultCUI) Close() {
+func (c *DefaultCUI) Close() {
 	termbox.Close()
 }
 
-func (c *defaultCUI) draw() {
+func (c *DefaultCUI) draw() {
 	w, _ := termbox.Size()
 	cellsPerKey := w / len(c.keyboard[0])
 
