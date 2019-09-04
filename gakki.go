@@ -18,7 +18,11 @@ type UI interface {
 type Gakki struct {
 	UI       UI
 	Keyboard [][]rune
-	WaveFunc func(x, wavelength float64) float64
+
+	WaveFunc     func(x, wavelength float64) float64
+	Waves        map[string]func(x, wavelength float64) float64
+	WaveName     string
+	WaveNameFunc func(key rune) string
 
 	FreqMap  map[rune]float64
 	ChordMap map[rune]Chord
@@ -55,9 +59,6 @@ func (g *Gakki) Run() error {
 	if g.Keyboard == nil {
 		return errors.New("Gakki: Keyboard is not set")
 	}
-	if g.WaveFunc == nil {
-		return errors.New("Gakki: WaveFunc is not set")
-	}
 
 	g.UI.SetKeyboard(g.Keyboard)
 	g.UI.SetKeyDisplayFunc(g.KeyDisplayFunc)
@@ -65,12 +66,12 @@ func (g *Gakki) Run() error {
 	keydownCh := make(chan rune, 10)
 	keyupCh := make(chan rune, 10)
 
-	go g.RunOto(keydownCh, keyupCh)
+	go g.runOto(keydownCh, keyupCh)
 
 	return g.UI.Run(keydownCh, keyupCh)
 }
 
-func (g *Gakki) RunOto(keydownCh, keyupCh <-chan rune) {
+func (g *Gakki) runOto(keydownCh, keyupCh <-chan rune) {
 	stopChannels := map[rune]chan struct{}{}
 	for {
 		select {
@@ -109,7 +110,22 @@ func (g *Gakki) play(key rune, stopCh <-chan struct{}) {
 	p := g.otoCtx.NewPlayer()
 	defer p.Close()
 
-	w := NewWave(freq, g.WaveFunc)
+	var waveName string
+	if g.WaveNameFunc != nil {
+		waveName = g.WaveNameFunc(key)
+	}
+	if waveName == "" {
+		waveName = g.WaveName
+	}
+	waveFunc, ok := g.Waves[waveName]
+	if !ok {
+		waveFunc = g.WaveFunc
+		if waveFunc == nil {
+			return
+		}
+	}
+	w := NewWave(freq, waveFunc)
+
 LOOP:
 	for {
 		select {

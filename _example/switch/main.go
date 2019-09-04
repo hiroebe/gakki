@@ -47,7 +47,11 @@ func main() {
 		g.Keyboard = gakki.GetDefaultJISKeyboard()
 	}
 
-	g.WaveFunc = sin
+	g.Waves = map[string]func(x, wavelength float64) float64{
+		"wave1": sin,
+		"wave2": sin2,
+	}
+	g.WaveName = "wave1"
 
 	startChord := gakki.NewChord("C4")
 	g.ChordMap = gakki.GetDefaultChordMap(startChord, g.Keyboard[1], g.Keyboard[2])
@@ -61,9 +65,9 @@ func main() {
 			startChord = startChord.Down()
 			g.ChordMap = gakki.GetDefaultChordMap(startChord, g.Keyboard[1], g.Keyboard[2])
 		case 'z':
-			g.WaveFunc = sin
+			g.WaveName = "wave1"
 		case 'x':
-			g.WaveFunc = sin2
+			g.WaveName = "wave2"
 		}
 	}
 	g.KeyDisplayFunc = func(key rune) string {
